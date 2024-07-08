@@ -1,0 +1,75 @@
+﻿@* Submission form for adding a dog *@
+
+@model cs208.Models.DogModel
+
+@{
+    ViewData["Title"] = "Formulář";
+}
+
+<h1>Přidat pejska do útulku @ViewBag.ShelterName</h1>
+
+<hr/>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Add">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Jméno</label>
+                <input maxlength="50" asp-for="Name" class="form-control"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="hidden" asp-for="ShelterId" value="@ViewBag.ShelterId" class="form-control"/>
+                <span asp-validation-for="ShelterId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Breed" class="control-label">Plemeno</label>
+                <input maxlength="50" asp-for="Breed" class="form-control"/>
+                <span asp-validation-for="Breed" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Sex" class="control-label">Pohlaví</label>
+                <select asp-for="Sex" class="form-control" asp-items="ViewBag.SexOptions"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Age" class="control-label">Věk (roky)</label>
+                <input min="0" max="35" value="0" asp-for="Age" class="form-control"/>
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Vaccinated"/>Očkován
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Popisek</label>
+                <textarea maxlength="250" id="desc" asp-for="Description" class="form-control" style="height: 250px; resize: none;"/></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+                <p>Počet znaků: <span id="charCount">0</span>/250</p>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Odeslat" class="btn btn-primary" style="margin-top: 10px"/>
+            </div>
+        </form>
+        <p style="margin-top: 20px">@Html.ActionLink("Zpět", "ShelterDetails", "Shelter", new { shelterID = ViewBag.ShelterId })</p>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+@* JavaScript *@
+@* count number of characters in the description textarea *@
+<script>
+    // get textarea by ID
+    var textInput = document.getElementById("desc");
+    // get char counter span by ID
+    var charCount = document.getElementById("charCount");
+
+    // listen for user input into the textarea
+    textInput.addEventListener("input", function () {
+        // display char count
+        charCount.textContent = textInput.value.length;
+    });
+</script>

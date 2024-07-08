@@ -1,0 +1,112 @@
+﻿@* Detailed view of a dog *@
+
+@model cs208.Models.DogModel
+
+@{
+    ViewData["Title"] = Model.Name == null ? "Detail pejska" : Model.Name;
+}
+
+<div style="display: flex;">
+    <div>
+        <div style="display: flex;">
+            @if (Model.Name == null)
+            {
+                <h2>Pejsek není pojmenovaný</h2>
+            }
+            else
+            {
+                <h2>@Model.Name</h2>
+            }
+            @if (Model.Adopted == true)
+            {
+                <input type="button" value="Už jsem adoptovaný" class="btn btn-primary" style="margin-left: 10px" disabled/>
+            }
+            else
+            {
+                <input type="button" value="Adoptovat" class="btn btn-primary" style="margin-left: 10px" onclick="confirmAdoption('@Url.Action("Adopt", "Dog", new { dogID = Model.Id, fromDogDetail = true })')" />
+            }
+        </div>
+
+        @if (Model.Breed == null)
+        {
+            <h5>Plemeno: nevyplněno</h5>
+        }
+        else
+        {
+            <h5>Plemeno: @Model.Breed</h5>
+        }
+
+        @if (Model.Age == null)
+        {
+            <h5>Věk: nevyplněno</h5>
+        }
+        else
+        {
+            switch (Model.Age)
+            {
+                case 0:
+                    <h5>Věk: 0 let</h5>
+                    break;
+                case 1:
+                    <h5>Věk: 1 rok</h5>
+                    break;
+                case < 5:
+                    <h5>Věk: @Model.Age roky</h5>
+                    break;
+                default:
+                    <h5>Věk: @Model.Age let</h5>
+                    break;
+            }
+        }
+
+        @if (Model.Sex == 'F')
+        {
+            <h5>Pohlaví: fena</h5>
+        }
+        else
+        {
+            <h5>Pohlaví: pes</h5>
+        }
+
+        @if (Model.Vaccinated == true)
+        {
+            <h5>Očkován: ano</h5>
+        }
+        else
+        {
+            <h5>Očkován: ne</h5>
+        }
+
+        <h5>Popis:</h5>
+        @if (Model.Description == null)
+        {
+            <p>Pejsek nemá žádný popis.</p>
+        }
+        else
+        {
+            <p>@Model.Description</p>
+        }
+    </div>
+    <div style="margin-left: 200px">
+        <h2>Útulek:</h2>
+        <h3>@Html.ActionLink(Model.Shelter.Name + ", " + Model.Shelter.City, "ShelterDetails", "Shelter", new { shelterID = Model.Shelter.Id })</h3>
+        <p>
+            Tel. číslo: @Model.Shelter.Phone<br>
+            Email: @Model.Shelter.Email
+        </p>
+    </div>
+</div>
+
+@* JavaScript *@
+@* if user clicks adopt, ask for confirmation *@
+<script>
+    function confirmAdoption(url) {
+        // display confirmation dialog
+        var confirmation = confirm("Potvrďte adoptování");
+
+        // if user confirms, call DogController Adopt function
+        if (confirmation) {
+            window.location.href = url;
+        }
+    }
+</script>

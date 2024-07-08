@@ -1,0 +1,43 @@
+﻿@* Landing page with a list of shelters *@
+
+@model (List<cs208.Models.ShelterModel> Shelters, bool NotFound)
+
+@{
+    ViewData["Title"] = "adopt.me";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Vítejte na adopt.me!</h1>
+</div>
+
+<div>
+    <h2>Seznam útulků:</h2>
+    <ul>
+        @if (Model.Shelters.Count == 0)
+        {
+            <li>Nebyly nalezeny žádné útulky.</li>
+        } else
+        {
+            foreach (var shelter in Model.Shelters)
+            {
+                if (shelter != null)
+                {
+                    <li>@Html.ActionLink(shelter.Name + ", " + shelter.City, "ShelterDetails", "Shelter", new { shelterID = shelter.Id })</li>
+                }
+            }
+        }
+    </ul>
+</div>
+
+@* JavaScript *@
+@* alert the user of an error while trying to access invalid database entries *@
+@if (Model.NotFound == true)
+{
+    <script>
+        window.alert('Chyba při hledání dat, budete přesměrováni na domovskou stránku');
+
+        let url = new URL(window.location.href);
+        url.searchParams.delete('notFound');
+        history.replaceState(history.state, '', url.href);
+    </script>
+}

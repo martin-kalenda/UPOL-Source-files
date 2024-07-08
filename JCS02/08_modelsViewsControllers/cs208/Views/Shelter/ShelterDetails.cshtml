@@ -1,0 +1,149 @@
+﻿@* Detailed view of a shelter with it's list of dogs for adoption *@
+
+@model (cs208.Models.ShelterModel Shelter, sbyte Added)
+
+@{
+    ViewData["Title"] = Model.Shelter.Name;
+}
+
+<div style="display: flex; gap: 20px">
+    <h2>@Model.Shelter.Name</h2>
+    <input type="button" value="Přidat pejska" class="btn btn-primary" onclick="location.href='@Url.Action("Add", "Dog", new { shelterID = Model.Shelter.Id })'"/>
+</div>
+
+<h3>Adresa:</h3>
+<p>
+    @Model.Shelter.Street @Model.Shelter.HouseNo<br>
+    @Model.Shelter.ZipCode @Model.Shelter.City<br>
+    @Model.Shelter.Country
+</p>
+    
+<h3>Kontakt:</h3>
+<p>
+    Tel. číslo: @Model.Shelter.Phone<br>
+    Email: @Model.Shelter.Email
+</p>
+    
+<h3>Popis:</h3>
+<p>
+    @if (Model.Shelter.Description != null)
+    {
+        @Model.Shelter.Description
+    } else
+    {
+        <p>Útulek popis nevyplnil.</p>
+    }
+</p>
+
+<h3>Pejsci k adoptování:</h3>
+@if (Model.Shelter.Dogs.Count == 0)
+{
+    <li>Nebyli nalezeni žádní pejsci k adoptování.</li>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Jméno</th>
+                <th>Plemeno</th>
+                <th>Věk</th>
+                <th>Pohlaví</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dog in Model.Shelter.Dogs.Where(d => d.Adopted == false))
+            {
+                <tr>
+                    @if (dog.Name == null)
+                    {
+                        <td>nemá</td>
+                    }
+                    else
+                    {
+                        <td>@dog.Name</td>
+                    }
+                    @if (dog.Breed == null)
+                    {
+                        <td>nevyplněno</td>
+                    }
+                    else
+                    {
+                        <td>@dog.Breed</td>
+                    }
+                    @if (dog.Age == null)
+                    {
+                        <td>nevyplněno</td>
+                    }
+                    else
+                    {
+                        switch (dog.Age)
+                        {
+                            case 0:
+                                <td>0 let</td>
+                                break;
+                            case 1:
+                                <td>1 rok</td>
+                                break;
+                            case < 5:
+                                <td>@dog.Age roky</td>
+                                break;
+                            default:
+                                <td>@dog.Age let</td>
+                                break;
+                        }
+                    }
+                    @if (dog.Sex == 'F')
+                    {
+                        <td>fena</td>
+                    }
+                    else
+                    {
+                        <td>pes</td>
+                    }
+                    <td>
+                        <input type="button" value="Přejít na detail" class="btn btn-secondary" onclick="location.href='@Url.Action("DogDetails", "Dog", new { dogID = dog.Id })'"/>
+                        <input type="button" value="Adoptovat" class="btn btn-primary" onclick="confirmAdoption('@Url.Action("Adopt", "Dog", new { dogID = dog.Id })')"/>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@* JavaScript *@
+@* if redirected from Dog/Add action, inform the user whether the addition was successful *@
+@if (Model.Added == 1)
+{
+    <script>
+        window.alert('Přidání proběhlo úspěšně');
+
+        let url = new URL(window.location.href);
+        url.searchParams.delete('added');
+        history.replaceState(history.state, '', url.href);
+    </script>
+}
+else if (Model.Added == -1)
+{
+    <script>
+        window.alert("Při přidávání došlo k chybě.")
+
+        let url = new URL(window.location.href);
+        url.searchParams.delete('added');
+        history.replaceState(history.state, '', url.href);
+    </script>
+}
+
+@* if user clicks adopt, ask for confirmation *@
+<script>
+    function confirmAdoption(url) {
+        // display confirmation dialog
+        var confirmation = confirm("Potvrďte adoptování");
+
+        // if user confirms, call DogController Adopt function
+        if (confirmation) {
+            window.location.href = url;
+        }
+    }
+</script>

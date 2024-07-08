@@ -1,0 +1,90 @@
+﻿@* Search results for a given dog name *@
+
+@model List<cs208.Models.DogModel>
+
+@{
+    ViewData["Title"] = "Hledání";
+}
+
+<h1>Výsledky hledání pro jméno: @ViewBag.SearchedName</h1>
+@if (Model.Count == 0)
+{
+    <p>Nebyl nalezen žádný neadoptovaný pejsek s tímto jménem.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Plemeno</th>
+                <th>Věk</th>
+                <th>Pohlaví</th>
+                <th>Útulek</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dog in Model)
+            {
+                <tr>
+                    @if (dog.Breed == null)
+                    {
+                        <td>nevyplněno</td>
+                    }
+                    else
+                    {
+                        <td>@dog.Breed</td>
+                    }
+                    @if (dog.Age == null)
+                    {
+                        <td>nevyplněno</td>
+                    }
+                    else
+                    {
+                        switch (dog.Age)
+                        {
+                            case 0:
+                                <td>0 let</td>
+                                break;
+                            case 1:
+                                <td>1 rok</td>
+                                break;
+                            case < 5:
+                                <td>@dog.Age roky</td>
+                                break;
+                            default:
+                                <td>@dog.Age let</td>
+                                break;
+                        }
+                    }
+                    @if (dog.Sex == 'F')
+                    {
+                        <td>fena</td>
+                    }
+                    else
+                    {
+                        <td>pes</td>
+                    }
+                    <td>@Html.ActionLink(dog.Shelter.Name + ", " + dog.Shelter.City, "ShelterDetails", "Shelter", new { shelterID = dog.ShelterId })</td>
+                    <td>
+                        <input type="button" value="Přejít na detail" class="btn btn-secondary" onclick="location.href='@Url.Action("DogDetails", "Dog", new { dogID = dog.Id })'" />
+                        <input type="button" value="Adoptovat" class="btn btn-primary" onclick="confirmAdoption('@Url.Action("Adopt", "Dog", new { dogID = dog.Id, fromDogSearch = true })')" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@* JavaScript *@
+@* if user clicks adopt, ask for confirmation *@
+<script>
+    function confirmAdoption(url) {
+        // display confirmation dialog
+        var confirmation = confirm("Potvrďte adoptování");
+
+        // if user confirms, call DogController Adopt function
+        if (confirmation) {
+            window.location.href = url;
+        }
+    }
+</script>
